@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AIRA - Emergency Alerts Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    nav {
+      background-color: #ff5252;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      height: calc(100vh - 70px);
+    }
+
+    #sidebar {
+      width: 300px;
+      max-width: 100%;
+      overflow-y: auto;
+      background: #f7f7f7;
+      border-right: 1px solid #ddd;
+      padding: 1rem;
+    }
+
+    #map {
+      flex: 1;
+    }
+
+    #analysis {
+      width: 300px;
+      max-width: 100%;
+      overflow-y: auto;
+      background: #f7f7f7;
+      border-left: 1px solid #ddd;
+      padding: 1rem;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .alert-item {
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid #ccc;
+      font-size: 0.9rem;
+    }
+
+    .alert-item:hover {
+      background: #eee;
+      cursor: pointer;
+    }
+
+    @media (max-width: 1000px) {
+      .content {
+        flex-direction: column;
+      }
+
+      #sidebar, #analysis {
+        width: 100%;
+        max-height: 200px;
+        border: none;
+        border-bottom: 1px solid #ddd;
+      }
+
+      #map {
+        height: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Report Emergency</a>
+  <a href="map.html">Alerts Map</a>
+</nav>
+
+<div class="content">
+  <div id="sidebar">
+    <h2>Nearby Alerts</h2>
+    <div id="alertList">Loading...</div>
+  </div>
+
+  <div id="map"></div>
+
+  <div id="analysis">
+    <h2>AI Danger Analysis</h2>
+    <div id="aiAdvice">Analyzing your area...</div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  const fireIcon = L.icon({
+    iconUrl: './images/fire.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+  });
+
+  const medicalIcon = L.icon({
+    iconUrl: './images/hospital.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+  });
+
+  const crimeIcon = L.icon({
+    iconUrl: './images/police-handcuffs.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+  });
+
+  const unknownIcon = L.icon({
+    iconUrl: './images/siren.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+  });
+
+  const userIcon = L.icon({
+    iconUrl: './images/pin-map.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+  });
+
+  const map = L.map('map').setView([10.3157, 123.8854], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+  }).addTo(map);
+
+  let userLat = null;
+  let userLng = null;
+
+  function calculateDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  fetch('https://opensheet.elk.sh/1MWPz3UnQ2ijBQXfgVOccRYddaa16KVW8fBctVcINTDM/IncidentLog')
+    .then(response => response.json())
+    .then(data => {
+      navigator.geolocation.getCurrentPosition(position => {
+        userLat = position.coords.latitude;
+        userLng = position.coords.longitude;
+
+        const userMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map);
+        userMarker.bindPopup("<b>Your Location</b>").openPopup();
+        map.setView([userLat, userLng], 13);
+
+        const nearbyAlerts = data.filter(alert => {
+          const lat = parseFloat(alert.Latitude);
+          const lng = parseFloat(alert.Longitude);
+          return !isNaN(lat) && !isNaN(lng) && calculateDistance(userLat, userLng, lat, lng) <= 5;
+        });
+
+        displayAlerts(nearbyAlerts);
+        analyzeArea(nearbyAlerts);
+
+        data.forEach(alert => {
+          const lat = parseFloat(alert.Latitude);
+          const lng = parseFloat(alert.Longitude);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            let icon = unknownIcon;
+            if (alert.Type === "Fire") icon = fireIcon;
+            else if (alert.Type === "Medical") icon = medicalIcon;
+            else if (alert.Type === "Crime") icon = crimeIcon;
+
+            const marker = L.marker([lat, lng], { icon }).addTo(map);
+            marker.bindPopup(`
+              <b>Location:</b> ${alert.Location}<br>
+              <b>Type:</b> ${alert.Type}<br>
+              <b>Details:</b> ${alert.Text}<br>
+              <b>Time:</b> ${alert.Timestamp}
+            `);
+          }
+        });
+
+      }, () => {
+        console.warn("Location access denied.");
+        document.getElementById('alertList').textContent = "Cannot detect location.";
+        document.getElementById('aiAdvice').textContent = "Cannot analyze dangers without location.";
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById('alertList').textContent = "Failed to load alerts.";
+      document.getElementById('aiAdvice').textContent = "Failed to analyze area.";
+    });
+
+  function displayAlerts(nearbyAlerts) {
+    const alertList = document.getElementById('alertList');
+    if (nearbyAlerts.length === 0) {
+      alertList.textContent = "No nearby alerts.";
+    } else {
+      alertList.innerHTML = "";
+      nearbyAlerts.forEach(alert => {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = "alert-item";
+        alertDiv.innerHTML = `
+          <b>${alert.Type}</b> - ${alert.Location}<br>
+          ${alert.Text}<br>
+          <small>${alert.Timestamp}</small>
+        `;
+        alertDiv.addEventListener('click', () => {
+          map.setView([alert.Latitude, alert.Longitude], 15);
+        });
+        alertList.appendChild(alertDiv);
+      });
+    }
+  }
+
+  function analyzeArea(alerts) {
+    const aiAdvice = document.getElementById('aiAdvice');
+    const types = alerts.map(a => a.Type);
+    let adviceText = "";
+
+    if (types.includes("Fire")) {
+      adviceText += `<b>Fire Risk Detected:</b><br>
+      🔥 Stay alert for smoke or unusual heat.<br>
+      🚪 Know exit routes.<br>
+      🧯 Prepare fire extinguisher if available.<br><br>`;
+    }
+
+    if (types.includes("Crime")) {
+      adviceText += `<b>Crime Risk Nearby:</b><br>
+      🚔 Be cautious in dark or isolated areas.<br>
+      🧑‍🤝‍🧑 Travel in groups if possible.<br>
+      📞 Keep emergency contacts ready.<br><br>`;
+    }
+
+    if (types.includes("Medical")) {
+      adviceText += `<b>Ongoing Medical Emergency:</b><br>
+      🩺 Avoid congested areas to allow emergency responders access.<br>
+      🚑 If you feel unwell, seek medical help.<br><br>`;
+    }
+
+    if (adviceText === "") {
+      adviceText = "✅ No specific dangers detected in your area. Stay prepared.";
+    } else {
+      adviceText += "<b>General Advice:</b><br>📱 Keep your phone charged.<br>🧳 Prepare a small emergency kit.<br>📢 Follow instructions from local authorities.";
+    }
+
+    aiAdvice.innerHTML = adviceText;
+  }
+</script>
+
+</body>
+</html>
