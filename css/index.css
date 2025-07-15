@@ -1,0 +1,23 @@
+html{
+    font-family: 'Inter', sans-serif;
+    font-family: 'Lato', sans-serif;
+    scroll-behavior: smooth;
+}
+
+input {
+    border: 1px solid lightgrey;
+    border-radius: 6px;
+    padding: 0.5rem;
+    outline: none;
+}
+
+input:hover {
+    border: 1px solid rgb(172, 170, 170);
+}
+input:focus {
+    outline: 1px solid #0A5ECD;
+}
+
+p{
+    margin: 0;
+}
