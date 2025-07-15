@@ -22,24 +22,25 @@
 
 <body class="">
     
-    <div id="chat-container" class="w-full h-full bg-white shadow-lg rounded-t-lg">
+    <div id="chat-container" class="w-full h-full bg-white  rounded-t-lg">
         <button type="button" id="collapsible" class="collapsible">
-           Aira
         </button>
-        <div id="chat-content" class="h-full"></div>
-        <div class="chat-footer">
-            <div class="chat-input">
-                <input id="chat-input-box" type="text" class="chat-input-box" placeholder="Enter your message!!" />
+        <div id="chat-content" class="h-full mx-auto"></div>
+        <div class="chat-footer flex items-center justify-center gap-4 mt-8">
+            <div class="chat-input w-2/3">
+                <input id="chat-input-box" type="text" class="chat-input-box rounded-xl h-12" placeholder="Enter your message!!" />
             </div>
             <div class="chat-input-buttons">
                 <!-- <i class="fa fa-heart"></i> -->
-                <button id="sendButton" type="button" id="chat-input-send" class="chat-input-send">
+                <button id="sendButton" type="button" id="chat-input-send" class="chat-input-send bg-blue-100 rounded-2xl px-4 h-12 text-xl">
                     Send
                     <i class="fa fa-paper-plane"></i>
                 </button>
             </div>
         </div>
     </div>
+
+    
 
       <!-- BOTTOM NAV WITH ICONS -->
   <nav class="bg-white border-t flex justify-around py-3 fixed bottom-0 right-0 z-50 w-full">

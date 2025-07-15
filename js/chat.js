@@ -104,3 +104,6 @@ function addBotBubble(text) {
 
   document.getElementById("chat-content").appendChild(botBubble);
 }
+
+
+  
