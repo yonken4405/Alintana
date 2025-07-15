@@ -4,7 +4,8 @@ let availableVoices = [];
 let recognition;
 let isListening = false;
 const webhookUrl = "https://n8n-yrm3.onrender.com/webhook/c1bbc699-15e0-4e30-816b-4ca72f4e577d";
-const recordBtn = document.getElementById('recordBtn');
+// Don't get elements at top-level, wait for DOMContentLoaded
+let chime;
 
 // Load voices
 window.speechSynthesis.onvoiceschanged = () => {
@@ -29,15 +30,32 @@ recognition.onend = () => {
   isListening = false;
 };
 
-recordBtn.addEventListener('click', () => {
-  const now = Date.now();
-  if (now - lastTap < 400 && !isListening) {
-    chime.play();
-    isListening = true;
-    recognition.start();
+document.addEventListener('DOMContentLoaded', function() {
+  const recordBtn = document.getElementById('recordBtn');
+  chime = document.getElementById('chime');
+  if (recordBtn) {
+    recordBtn.addEventListener('click', function() {
+      // For now, trigger on every click for testing
+      if (chime) chime.play();
+      if (recognition && !isListening) {
+        isListening = true;
+        recognition.start();
+      } else if (!recognition) {
+        alert('Speech recognition not supported.');
+      }
+    });
   }
-  lastTap = now;
 });
+
+// recordBtn.addEventListener('click', () => {
+//   const now = Date.now();
+//   if (now - lastTap < 400 && !isListening) {
+//     chime.play();
+//     isListening = true;
+//     recognition.start();
+//   }
+//   lastTap = now;
+// });
 
 recognition.onresult = (event) => {
   const transcript = event.results[0][0].transcript;
