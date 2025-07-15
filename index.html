@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AIRA — Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#F5F3F1] flex flex-col min-h-screen ">
+
+  <div class="flex-1 overflow-auto px-4 pt-4 pb-6">
+
+    <!-- HEADER -->
+    <header class="flex justify-between items-start border-b pb-2">
+      <div>
+        <h1 class="text-lg font-bold md:text-xl">ALINTANA</h1>
+        <p class="flex items-center text-gray-500 text-xs md:text-sm mt-1">
+          <span class="mr-1">📍</span>
+          Sambag 1, Urgello St., Cebu City
+        </p>
+      </div>
+      <img
+        src="https://randomuser.me/api/portraits/women/1.jpg"
+        alt="User"
+        class="w-10 h-10 rounded-full object-cover md:w-12 md:h-12"
+      />
+    </header>
+
+    <!-- ALERT BAR -->
+    <div class="mt-3 flex items-center justify-center">
+      <span class="inline-flex items-center bg-[#FFD198] border border-[#FFA166] text-orange-600
+                      rounded-full px-3 py-1 text-[10px] font-semibold md:text-xs">
+        <img src="images/warning-rhomb-filled-svgrepo-com.svg" alt="Home" class="w-4 h-4 mr-2"/>
+        GAS LEAK NEARBY, PLS BE CAUTIOUS
+      </span>
+    </div>
+
+
+
+    <!-- EMERGENCY CONTACTS -->
+    <section class="mt-4 ">
+      <h2 class="text-base font-semibold mb-2 md:text-lg">Emergency Contact</h2>
+      <div class="flex space-x-3 overflow-x-auto pb-2">
+        <!-- Add Contact -->
+      <div class="flex-shrink-0 flex flex-col items-center">
+        <button
+          class="w-12 h-12 md:w-14 md:h-14 bg-white border-4 border-indigo-200
+                rounded-full flex items-center justify-center leading-none shadow-sm text-indigo-600"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-6 h-6 md:w-8 md:h-8 stroke-current"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/>
+          </svg>
+        </button>
+        <span class="mt-1 text-xs md:text-sm text-gray-800">Add Contact</span>
+      </div>
+
+        <!-- Static Avatars -->
+        <div class="flex-shrink-0 flex flex-col items-center">
+          <img src="https://randomuser.me/api/portraits/women/2.jpg"
+               class="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-white shadow"
+               alt="Stacy"/>
+          <span class="mt-1 text-[10px] md:text-xs">Stacy Wilkins</span>
+        </div>
+        <div class="flex-shrink-0 flex flex-col items-center">
+          <img src="https://randomuser.me/api/portraits/women/3.jpg"
+               class="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-white shadow"
+               alt="Janice"/>
+          <span class="mt-1 text-[10px] md:text-xs">Janice Soliman</span>
+        </div>
+        <div class="flex-shrink-0 flex flex-col items-center">
+          <img src="https://randomuser.me/api/portraits/men/2.jpg"
+               class="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-white shadow"
+               alt="King"/>
+          <span class="mt-1 text-[10px] md:text-xs">King Ban</span>
+        </div>
+        <div class="flex-shrink-0 flex flex-col items-center">
+          <img src="https://randomuser.me/api/portraits/men/3.jpg"
+               class="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-white shadow"
+               alt="JJ"/>
+          <span class="mt-1 text-[10px] md:text-xs truncate w-12">JJ…</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ASSISTANCE BUTTONS: always 3-in-a-row -->
+    <section class="mt-4 grid grid-cols-3 gap-3">
+      <button data-type="Fire"
+              class="panicBtn flex flex-col items-center justify-center space-y-1
+                     bg-[#FFCD32] text-yellow-900 py-3 rounded-xl shadow text-sm
+                      md:space-y-0 md:space-x-2 md:text-base">
+            <img src="images/fire-svgrepo-com.svg" alt="Home" class="w-8 h-8 mb-1"/>
+        <span class="font-semibold text-slate-800">Fire Assistance</span>
+      </button>
+
+      <button data-type="Medical"
+              class="panicBtn flex flex-col items-center justify-center space-y-1
+                     bg-[#FF5252] text-white py-3 rounded-xl shadow text-sm
+                     md:space-y-0 md:space-x-2 md:text-base">
+         <img src="images/medical-kit-svgrepo-com.svg" alt="Home" class="w-8 h-8 mb-1"/>
+        <span class="font-semibold  text-slate-800">Medical Assistance</span>
+      </button>
+
+      <button data-type="Crime"
+              class="panicBtn flex flex-col items-center justify-center space-y-1
+                     bg-[#37DAF4] text-white py-3 rounded-xl shadow text-sm
+                      md:space-y-0 md:space-x-2 md:text-base">
+          <img src="images/crime-handcuffs-magic-magician-police-svgrepo-com.svg" alt="Home" class="w-8 h-8 mb-1"/>
+        <span class="font-semibold  text-slate-800">Crime Assistance</span>
+      </button>
+    </section>
+
+    <!-- DOUBLE TAP LABEL -->
+    <p class="text-center text-gray-800 font-medium mt-4 text-sm md:text-base">
+      Double tap to Speak
+    </p>
+
+    <!-- GLOWING SOS BUTTON -->
+    <div class="relative flex justify-center mt-12">
+      <div class="absolute w-28 h-28 md:w-32 md:h-32 bg-red-300 rounded-full opacity-30 animate-ping"></div>
+      <button id="recordBtn"
+              class="relative w-28 h-28 md:w-32 md:h-32 bg-gradient-to-br from-red-400 to-red-600
+                     rounded-full flex items-center justify-center text-white text-2xl md:text-3xl font-bold shadow-xl">
+        SOS
+      </button>
+    </div>
+
+    <!-- RESPONDERS -->
+    <div class="flex justify-center mt-4 -space-x-2">
+      <img src="https://randomuser.me/api/portraits/men/4.jpg"
+           class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white shadow" alt="">
+      <img src="https://randomuser.me/api/portraits/women/5.jpg"
+           class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white shadow" alt="">
+      <img src="https://randomuser.me/api/portraits/men/5.jpg"
+           class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white shadow" alt="">
+    </div>
+    <p class="text-center text-[10px] text-gray-500 px-4 mt-1 md:text-xs">
+      Your Emergency SOS will be sent to the contacts above
+    </p>
+
+  </div>
+
+  <!-- BOTTOM NAV WITH ICONS -->
+  <nav class="bg-white border-t flex justify-around py-3">
+  <a href="index.html" class="flex flex-col items-center text-slate-800">
+    <img src="images/home-angle-2-svgrepo-com.svg" alt="Home" class="w-6 h-6 mb-1"/>
+    <span class="text-xs">Home</span>
+  </a>
+  <a href="map.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+    <img src="images/map-point-wave-svgrepo-com.svg" alt="Map" class="w-6 h-6 mb-1"/>
+    <span class="text-xs">Map</span>
+  </a>
+  <div class="flex flex-col items-center text-gray-400 opacity-50 cursor-default">
+    <img src="images/emergency-call-svgrepo-com.svg" alt="Medical ID" class="w-6 h-6 mb-1"/>
+    <span class="text-xs">Medical ID</span>
+  </div>
+  <!-- <div class="flex flex-col items-center text-gray-400 opacity-50 cursor-default">
+    <img src="images/emergency.svg" alt="Emergency" class="w-6 h-6 mb-1"/>
+    <span class="text-xs">Emergency</span>
+  </div> -->
+</nav>
+
+
+  <!-- Link to external JS -->
+  <script src="app.js"></script>
+</body>
+</html>
