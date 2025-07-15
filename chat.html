@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+
+    function sendToN8N(text) {
+        fetch("http://localhost:5680/webhook/d1b4db5d-1c42-4016-8db9-8df168fec750", {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text})
+        })
+        .then(response => response.json())
+        .then(data => {
+        
+            if (data && data.advice) {
+            speak(data.advice);
+            } else {
+            
+            }
+        })
+        .catch(() => {
+            
+        });
+    }
+</script>
+
+</html>
