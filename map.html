@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Alert Map</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='maps.css'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=location_on" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="script.js" defer></script>
+<body>
+    <section class="top">
+        <h3>Yurii Yankin</h3>
+        <div class="location-container">
+            <span class="material-symbols-outlined"> location_on</span>
+            <h5 id="location"> Sambag 1, Urgello St. Cebu City</h5>
+        </div>
+        <img class="profile" src="/images/profile.svg" alt="Profile">
+    </section>
+
+    <div id="map"></div>
+
+    <!-- BOTTOM NAV WITH ICONS -->
+    <nav class="bg-white border-t flex justify-around py-3 fixed bottom-0 w-full">
+        <a href="index.html" class="flex flex-col items-center text-slate-800">
+            <img src="images/home-angle-2-svgrepo-com.svg" alt="Home" class="w-6 h-6 mb-1"/>
+            <span class="text-xs">Home</span>
+        </a>
+        <a href="map.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <img src="images/map-point-wave-svgrepo-com.svg" alt="Map" class="w-6 h-6 mb-1"/>
+            <span class="text-xs">Map</span>
+        </a>
+        <a href="map.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <img src="images/chat-round-line-svgrepo-com.svg" alt="Map" class="w-6 h-6 mb-1"/>
+            <span class="text-xs">Chat</span>
+        </a>
+        <div class="flex flex-col items-center text-gray-400 opacity-50 cursor-default">
+            <img src="images/emergency-call-svgrepo-com.svg" alt="Medical ID" class="w-6 h-6 mb-1"/>
+            <span class="text-xs">Emergency</span>
+        </div>
+        <!-- <div class="flex flex-col items-center text-gray-400 opacity-50 cursor-default">
+            <img src="images/emergency.svg" alt="Emergency" class="w-6 h-6 mb-1"/>
+            <span class="text-xs">Emergency</span>
+        </div> -->
+    </nav>
+
+    <button class="show-modal">Show Bottom Sheet</button>
+    <div class="bottom-sheet">
+      <div class="sheet-overlay"></div>
+      <div class="content">
+        <div class="header">
+          <div class="drag-icon"><span></span></div>
+        </div>
+        <center><img src="/images/superman.svg" alt="superman"></center>
+        <div class="body">
+            <div class="header-1">
+                <img src="/images/alert-icon.svg" alt="alert">
+                <div class="near">
+                    <h5 class="near-alert"></h5>
+                    <p class="near-location"></p>
+                </div>
+                <img src="/images/location.svg" alt="location">
+            </div>
+            <div class="header-2">
+                <h3><b>AI Analysis</b></h3>
+                <br>
+                <div id="aiAdvice">
+            </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+//FOR ICONS
+const fireIcon = L.icon({
+    iconUrl: './images/fire-svg.svg',
+    iconSize: [50, 50],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+});
+
+const crimeIcon = L.icon({
+    iconUrl: './images/criminal-svg.svg',
+    iconSize: [50, 50],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+});
+
+const medicalIcon = L.icon({
+    iconUrl: './images/hospital-svg.svg',
+    iconSize: [50, 50],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+});
+
+const unknownIcon = L.icon({
+    iconUrl: './images/emergency-svg.svg',
+    iconSize: [50, 50],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+});
+
+const userIcon = L.icon({
+    iconUrl: './images/profile.svg',
+    iconSize: [50, 50],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+});
+//FOR MAPS FUNCTIONALITY
+  const map = L.map('map').setView([10.3157, 123.8854], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+  }).addTo(map);
+
+  let userLat = null;
+  let userLng = null;
+
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lon2 - lon1) * Math.PI / 180;
+        const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+  fetch('https://opensheet.elk.sh/1MWPz3UnQ2ijBQXfgVOccRYddaa16KVW8fBctVcINTDM/IncidentLog')
+    .then(response => response.json())
+    .then(data => {
+      navigator.geolocation.getCurrentPosition(position => {
+        userLat = position.coords.latitude;
+        userLng = position.coords.longitude;
+
+        const userMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map);
+        userMarker.bindPopup("<b>Your Location</b>").openPopup();
+        map.setView([userLat, userLng], 13);
+
+        const nearbyAlerts = data.filter(alert => {
+          const lat = parseFloat(alert.Latitude);
+          const lng = parseFloat(alert.Longitude);
+          return !isNaN(lat) && !isNaN(lng) && calculateDistance(userLat, userLng, lat, lng) <= 5;
+        });
+
+        // displayAlerts(nearbyAlerts);
+        analyzeArea(nearbyAlerts);
+
+        data.forEach(alert => {
+          const lat = parseFloat(alert.Latitude);
+          const lng = parseFloat(alert.Longitude);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            let icon = unknownIcon;
+            if (alert.Type === "Fire") icon = fireIcon;
+            else if (alert.Type === "Medical") icon = medicalIcon;
+            else if (alert.Type === "Crime") icon = crimeIcon;
+
+            const marker = L.marker([lat, lng], { icon }).addTo(map);
+            marker.on('click', () => {
+                showBotSheet(alert.Type, alert.Location);
+                const loc = document.querySelector(".near-location");
+                const alrt = document.querySelector(".near-alert");
+                alrt.textContent = 'Nearby ' + alert.Type + ' alert!';
+                loc.textContent = 'Near ' + alert.Location;
+            });
+          }
+        });
+
+      }, () => {
+        console.warn("Location access denied.");
+        // document.getElementById('alertList').textContent = "Cannot detect location.";
+        // document.getElementById('aiAdvice').textContent = "Cannot analyze dangers without location.";
+      });
+    })
+    .catch(err => {
+      console.error(err);
+    //   document.getElementById('alertList').textContent = "Failed to load alerts.";
+    //   document.getElementById('aiAdvice').textContent = "Failed to analyze area.";
+    });
+
+    function showBotSheet(type, location) {
+        showBottomSheet();
+     }
+    // function displayAlerts(nearbyAlerts) {
+    // const alertList = document.getElementById('alertList');
+    // if (nearbyAlerts.length === 0) {
+    //   alertList.textContent = "No nearby alerts.";
+    // } else {
+    //   alertList.innerHTML = "";
+    //   nearbyAlerts.forEach(alert => {
+    //     const alertDiv = document.createElement('div');
+    //     alertDiv.className = "alert-item";
+    //     alertDiv.innerHTML = `
+    //       <b>${alert.Type}</b> - ${alert.Location}<br>
+    //       ${alert.Text}<br>
+    //       <small>${alert.Timestamp}</small>
+    //     `;
+    //     alertDiv.addEventListener('click', () => {
+    //       map.setView([alert.Latitude, alert.Longitude], 15);
+    //     });
+    //     alertList.appendChild(alertDiv);
+    //   });
+    //     }
+    // }
+
+  function analyzeArea(alerts) {
+    const aiAdvice = document.getElementById('aiAdvice');
+    const types = alerts.map(a => a.Type);
+    let adviceText = "";
+
+    if (types.includes("Fire")) {
+      adviceText += `<b>Fire Risk Detected:</b><br>
+      🔥 Stay alert for smoke or unusual heat.<br>
+      🚪 Know exit routes.<br>
+      🧯 Prepare fire extinguisher if available.<br><br>`;
+    }
+
+    if (types.includes("Crime")) {
+      adviceText += `<b>Crime Risk Nearby:</b><br>
+      🚔 Be cautious in dark or isolated areas.<br>
+      🧑‍🤝‍🧑 Travel in groups if possible.<br>
+      📞 Keep emergency contacts ready.<br><br>`;
+    }
+
+    if (types.includes("Medical")) {
+      adviceText += `<b>Ongoing Medical Emergency:</b><br>
+      🩺 Avoid congested areas to allow emergency responders access.<br>
+      🚑 If you feel unwell, seek medical help.<br><br>`;
+    }
+
+    if (adviceText === "") {
+      adviceText = "✅ No specific dangers detected in your area. Stay prepared.";
+    } else {
+      adviceText += "<b>General Advice:</b><br>📱 Keep your phone charged.<br>🧳 Prepare a small emergency kit.<br>📢 Follow instructions from local authorities.";
+    }
+
+    aiAdvice.innerHTML = adviceText;
+  }
+  
+</script>
+
+</body>
+</html>
