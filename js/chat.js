@@ -68,7 +68,7 @@ function getLocationAndSend(text) {
 }
 
 function sendToN8N(text, lat, lng, location) {
-  fetch("http://localhost:5680/webhook/3357ea9c-d2b4-43c4-a123-35e9301d9a76", {
+  fetch("https://n8n-yrm3.onrender.com/webhook/3357ea9c-d2b4-43c4-a123-35e9301d9a76", {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text, lat, lng, location })
